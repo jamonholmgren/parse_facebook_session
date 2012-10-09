@@ -9,7 +9,7 @@ class AppDelegate
   end
 
   def parse_setup
-    Parse.setApplicationId("M7dOHHwgdko8vzTKoLsErebJMmmPKtrTPaaEVkJC", clientKey: "u7CUnLC5jqUH1uRYCHcw2UCuclovzlb50ocqZBcS")
+    Parse.setApplicationId("EnenIJ4D3gl00sKCIQbUZLKn5TSaThoQrTw3m0j7", clientKey: "AcrSTHBx8ywRJ1BXMnChZzs1iDyCigpMip6dT3pI")
   end
 
   def initial_view
