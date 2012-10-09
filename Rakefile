@@ -19,7 +19,7 @@ Motion::Project::App.setup do |app|
 
   app.identifier = 'com.clearsightstudio.parse_facebook_session'
   app.info_plist['CFBundleURLTypes'] = [ 
-    { 'CFBundleURLName' => 'com.clearsightstudio.fb149153618559378', 'CFBundleURLSchemes' => ['fb149153618559378'] } 
+    { 'CFBundleURLName' => 'com.clearsightstudio.fb163845730420613', 'CFBundleURLSchemes' => ['fb163845730420613'] } 
   ]
 
   app.libs += ['/usr/lib/libz.dylib', '/usr/lib/libsqlite3.dylib']

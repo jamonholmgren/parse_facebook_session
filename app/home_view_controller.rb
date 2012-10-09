@@ -1,7 +1,4 @@
 class HomeViewController < UIViewController
-  FB_APP_ID = "163845730420613"
-  FB_APP_SECRET = "2819ba5117d8afb0f2b7dddb9e895bb1"
-
   def viewDidLoad
     super
   end
@@ -13,6 +10,18 @@ class HomeViewController < UIViewController
     @fb_connect_button.setTitle "Connect to Facebook", forState: UIControlStateNormal
     @fb_connect_button.addTarget(self, action: :connect_facebook, forControlEvents:UIControlEventTouchUpInside)
     self.view.addSubview @fb_connect_button
+
+    @logout_button = UIButton.buttonWithType(UIButtonTypeRoundedRect)
+    @logout_button.frame = CGRectMake(10, 80, 300, 40)
+    @logout_button.setTitle "Log Out", forState: UIControlStateNormal
+    @logout_button.addTarget(self, action: :log_out, forControlEvents:UIControlEventTouchUpInside)
+    self.view.addSubview @logout_button
+
+    @crash_button = UIButton.buttonWithType(UIButtonTypeRoundedRect)
+    @crash_button.frame = CGRectMake(10, 160, 300, 40)
+    @crash_button.setTitle "Crash it", forState: UIControlStateNormal
+    @crash_button.addTarget(self, action: :crash_it, forControlEvents:UIControlEventTouchUpInside)
+    self.view.addSubview @crash_button
   end
 
   def viewDidAppear(animated)
@@ -28,7 +37,75 @@ class HomeViewController < UIViewController
     self.presentModalViewController(@login, animated:true)
   end
 
+  def log_out
+    PFUser.logOut
+    display_login
+  end
+
+  def crash_it
+    params = NSMutableDictionary.dictionaryWithObjectsAndKeys "SELECT uid,first_name,middle_name,last_name,name,pic_small,pic_big,birthday,birthday_date FROM user WHERE uid IN (SELECT uid1 FROM friend WHERE uid2=me())", "query", nil
+    request = PFFacebookUtils.facebook.requestWithMethodName "fql.query", andParams:params,
+                       andHttpMethod:"POST",
+                         andDelegate:self
+  end
+
+  def requestLoading(request)
+  end
+  def request(request, didReceiveResponse: response)
+  end
+  def request(request, didLoad:result)
+    $stderr.puts result
+  end
+
+  def logInViewController(logIn, didLogInUser:user)
+    @login.dismissModalViewControllerAnimated(true)
+  end
+
   def connect_facebook
-    # PFFacebookUtils logInWithPermissions:permissionsArray block:^
+    if PFFacebookUtils.isLinkedWithUser PFUser.currentUser
+      link_user
+    else
+      unlink_user
+    end
+  end
+
+  def link_user
+    PFFacebookUtils.unlinkUserInBackground PFUser.currentUser, block: lambda { |success, error|
+      if success
+        alert = UIAlertView.alloc.initWithTitle "Facebook",
+          message: "Unlinked!",
+          delegate: nil,
+          cancelButtonTitle:"OK",
+          otherButtonTitles:nil
+        alert.show
+      else
+        alert = UIAlertView.alloc.initWithTitle "Facebook",
+          message: "Unlink failed!",
+          delegate: nil,
+          cancelButtonTitle:"DARN",
+          otherButtonTitles:nil
+        alert.show
+      end      
+    }
+  end
+
+  def unlink_user
+    PFFacebookUtils.linkUser PFUser.currentUser, permissions: ["friends_birthday"], block: lambda { |success, error|
+      if success
+        alert = UIAlertView.alloc.initWithTitle "Facebook",
+          message: "Linked!",
+          delegate: nil,
+          cancelButtonTitle:"OK",
+          otherButtonTitles:nil
+        alert.show
+      else
+        alert = UIAlertView.alloc.initWithTitle "Facebook",
+          message: "Link failed!",
+          delegate: nil,
+          cancelButtonTitle:"DARN",
+          otherButtonTitles:nil
+        alert.show
+      end
+    }
   end
 end
